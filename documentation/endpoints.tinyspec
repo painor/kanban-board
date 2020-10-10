@@ -1,0 +1,7 @@
+// **Creates** a new task and returns it's id in the task field
+POST /create_new_task {title: string}
+    // Returns a success message with a task object
+    => {message: string,task: Task}
+    // An error has happened while trying to add a new task
+    => 500 {error:string}
+
