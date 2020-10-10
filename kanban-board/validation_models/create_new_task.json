@@ -1,0 +1,16 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Create a new task",
+  "required": [
+    "task_title"
+  ],
+  "properties": {
+    "task_title": {
+      "type": "string",
+      "title": "The task title",
+      "default": ""
+    }
+  }
+}
