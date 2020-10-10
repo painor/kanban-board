@@ -1,0 +1,15 @@
+org: painor
+app: kanban-board
+service: kanban-board
+
+provider:
+  name: aws
+  runtime: python3.8
+
+functions:
+  create_new_task:
+    handler: handler.create_new_task
+    events:
+      - http:
+          path: /new_task
+          method: post
