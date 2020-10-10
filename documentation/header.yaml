@@ -1,0 +1,14 @@
+swagger: '2.0'
+info:
+  title: Kanban board
+  description: |-
+    #### HTTP REST JSON API
+    Documentation for the kanban board test REST API
+  version: '0.0.1'
+basePath: /dev
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json

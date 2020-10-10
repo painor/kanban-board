@@ -1,1 +1,9 @@
-Task !{id: integer, title: string,status :(0|1|2), start_date?: f, end_date?: f,price?:f}
+// Represents a task
+Task !{
+ id: integer,
+ title: string,
+ status: (0|1|2),
+ start_date?: f,
+ end_date?: f,
+ price?: f
+}

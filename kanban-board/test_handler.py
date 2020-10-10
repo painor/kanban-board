@@ -3,8 +3,8 @@ import json
 from datetime import datetime
 from unittest.mock import patch
 
-from base import Task, Status
-from handler import create_new_task, start_task, resolve_task
+from base import Task, Status, get_all_tasks
+from handler import create_new_task, start_task, resolve_task, get_tasks, get_task
 from string import ascii_lowercase
 import random
 
@@ -69,11 +69,77 @@ class TestHandler(unittest.TestCase):
         self.assertTrue(json.dumps(body) == json.dumps(excepted_result))
 
     def test_resolve_task(self):
-        """Tests resolve task"""
+        """Tests resolve_task"""
         task_id = 1
         received_json = {'body': json.dumps({
             'task_id': task_id
         })}
+        # monkey patch database call
+        date = datetime.now().timestamp()
+
+        def return_mock_task(*args):
+            task = Task('random_name')
+            task.id = 1
+            task.status = Status.DONE
+            task.start_date = date
+            task.end_date = date + 3600
+            task.price = 10.0
+            return task
+
+        with patch('handler.resolve_a_task', new=return_mock_task):
+            res = resolve_task(received_json, None)
+        self.assertEqual(200, res['statusCode'])
+        self.assertTrue(len(res['body']) > 0)
+
+        excepted_result = {'success': True, 'message': 'Task started successfully',
+                           'task': {'id': 1, 'title': 'random_name', 'status': 2, 'start_date': date,
+                                    'price': 10.0}}
+
+        body = json.loads(res['body'])
+        self.assertTrue(json.dumps(body) == json.dumps(excepted_result))
+
+    def test_get_tasks(self):
+        """Tests get_tasks"""
+
+        # monkey patch database call
+        date = datetime.now().timestamp()
+
+        def return_moch_task(*args):
+            tasks = []
+            task1 = Task('random_name')
+            task1.id = 1
+            task1.status = Status.DONE
+            task1.start_date = date
+            task1.end_date = date + 3600
+            task1.price = 10.0
+            tasks.append(task1)
+            task2 = Task('random_name')
+            task2.id = 2
+            task2.status = Status.DONE
+            task2.start_date = date
+            task2.end_date = date + 3600
+            task2.price = 10.0
+            tasks.append(task2)
+            return tasks
+
+        with patch('handler.get_all_tasks', new=return_moch_task):
+            res = get_tasks({"queryStringParameters": None}, None)
+        self.assertEqual(200, res['statusCode'])
+        self.assertTrue(len(res['body']) > 0)
+
+        excepted_result = {'success': True, 'tasks': [
+            {'id': 1, 'title': 'random_name', 'status': 2, 'start_date': date,
+             'end_date': date+3600, 'price': 10.0},
+            {'id': 2, 'title': 'random_name', 'status': 2, 'start_date': date,
+             'end_date': date+3600, 'price': 10.0}], 'total': 2}
+
+        body = json.loads(res['body'])
+
+
+        self.assertTrue(json.dumps(body) == json.dumps(excepted_result))
+
+    def test_get_task(self):
+        """Tests get_task"""
 
         # monkey patch database call
         date = datetime.now().timestamp()
@@ -84,16 +150,17 @@ class TestHandler(unittest.TestCase):
             task.status = Status.DONE
             task.start_date = date
             task.end_date = date + 3600
+            task.price = 10.0
             return task
 
-        with patch('handler.resolve_a_task', new=return_moch_task):
-            res = resolve_task(received_json, None)
+        with patch('handler.get_a_task', new=return_moch_task):
+            res = get_task({"pathParameters": {"id": "1"}}, None)
         self.assertEqual(200, res['statusCode'])
         self.assertTrue(len(res['body']) > 0)
 
-        excepted_result = {'success': True, 'message': 'Task started successfully',
+        excepted_result = {'success': True,
                            'task': {'id': 1, 'title': 'random_name', 'status': 2, 'start_date': date,
-                                    'price': 10.0}}
+                                    'end_date': date + 3600, 'price': 10.0}}
 
         body = json.loads(res['body'])
         self.assertTrue(json.dumps(body) == json.dumps(excepted_result))

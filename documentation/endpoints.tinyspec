@@ -20,3 +20,18 @@ POST /resolve_task {task_id: integer}
     // Returns the cause of the error in the error field (for example an incorrect id)
     => 500 {success:b, error: string}
 
+// **Retrieves** all tasks and returns them. Optionally a filter can be passed
+// Filters are "new" , "in_progress" and "done"
+GET /tasks?filter?:s
+    // Returns a list of tasks and their total count
+    => {success:b,"tasks":Task[],"total":integer}
+    // Returns the cause of the error in the error field (for example an incorrect filter type)
+    => 500 {success:b, error: string}
+
+// **Retrieves** one task by it's id and returns it.
+GET /tasks/:id:i
+    // Returns the task object
+    => {success:b,"task":Task}
+    // Returns the cause of the error in the error field (for example an incorrect id)
+    => 500 {success:b, error: string}
+

@@ -2,7 +2,7 @@ import json
 import random
 import traceback
 
-from base import add_new_task, start_new_task, resolve_a_task
+from base import add_new_task, start_new_task, resolve_a_task, get_all_tasks, get_a_task
 
 
 def create_new_task(event, context):
@@ -69,9 +69,6 @@ def resolve_task(event, context):
         received_json = json.loads(event["body"])
         task_id = received_json["task_id"]
         task = resolve_a_task(task_id)
-        duration = task.end_date - task.start_date
-        # hourly rate is 10$
-        price = (duration / 3600) * 10
 
         body = {
             "success": True,
@@ -81,12 +78,62 @@ def resolve_task(event, context):
                 "title": task.title,
                 "status": task.status,
                 "start_date": task.start_date,
-                "price": price
+                "price": task.price
             }
         }
         return {
             "statusCode": 200,
             "body": json.dumps(body)
+        }
+    except Exception as e:
+        traceback.print_exc()
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "success": False,
+                "error": str(e)
+            })
+        }
+
+
+def get_tasks(event, context):
+    try:
+        filter_by = None
+        if event["queryStringParameters"]:
+            if "filter" in event["queryStringParameters"]:
+                allowed_filters = ("new", "in_progress", "done")
+                if event["queryStringParameters"] not in allowed_filters:
+                    raise Exception(f"Unknown filter value '{event['queryStringParameters']}'")
+                filter_by = allowed_filters.index(event['queryStringParameters'])
+        tasks = get_all_tasks(filter_by)
+        tasks = [task.to_dict() for task in tasks]
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"success": True,
+                                "tasks": tasks,
+                                "total": len(tasks)})
+        }
+    except Exception as e:
+        traceback.print_exc()
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "success": False,
+                "error": str(e)
+            })
+        }
+
+
+def get_task(event, context):
+    try:
+        param: str = event["pathParameters"]["id"]
+        if not param.isdigit():
+            raise Exception("ID should be an integer")
+        param: int = int(param)
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"success": True,
+                                "task": get_a_task(param).to_dict()})
         }
     except Exception as e:
         traceback.print_exc()

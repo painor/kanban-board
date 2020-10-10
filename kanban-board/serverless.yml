@@ -47,3 +47,18 @@ functions:
           request:
             schema:
               application/json: ${file(validation_models/resolve_task.json)}
+
+
+  retrieve_tasks:
+    handler: handler.get_tasks
+    events:
+      - http:
+          path: /tasks
+          method: get
+
+  retrieve_task:
+    handler: handler.get_task
+    events:
+      - http:
+          path: /tasks/{id}
+          method: get

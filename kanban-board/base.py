@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import create_engine, Column, String, Integer, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
@@ -27,10 +28,27 @@ class Task(Base):
     status = Column('status', Integer)
     start_date = Column('start_date', TIMESTAMP)
     end_date = Column('end_date', TIMESTAMP)
+    price = Column('price', Integer)
 
     def __init__(self, title):
         self.title = title
         self.status = Status.NEW
+
+    def to_dict(self):
+        d = {}
+        if self.id:
+            d["id"] = self.id
+        if self.title:
+            d["title"] = self.title
+        if self.status:
+            d["status"] = self.status
+        if self.start_date:
+            d["start_date"] = self.start_date
+        if self.end_date:
+            d["end_date"] = self.end_date
+        if self.price:
+            d["price"] = self.price
+        return d
 
 
 def add_new_task(title: str) -> int:
@@ -69,5 +87,26 @@ def resolve_a_task(task_id: int) -> Task:
     task.status = Status.DONE
     end_date = datetime.now().timestamp()
     task.end_date = end_date
+    task.price = (task.start_date - task.end_date) * 10 / 3600
     session.commit()
+    return task
+
+
+def get_all_tasks(filter_by: int) -> List[Task]:
+    """Retrieves a list of tasks"""
+    session = Session()
+    query = session.query(Task)
+    if filter_by:
+        tasks = query.filter(Task.status == filter_by).all()
+    else:
+        tasks = query.all()
+    return tasks
+
+
+def get_a_task(task_id: int) -> Task:
+    """Retrieve a task by it's id"""
+    session = Session()
+    task: Task = session.query(Task).get(task_id)
+    if not task:
+        raise Exception(f'Task with id {task_id} not found')
     return task
