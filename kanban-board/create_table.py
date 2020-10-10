@@ -1,5 +1,4 @@
-from base import Session, engine, Base
-from sqlalchemy import Column, String, Integer, DateTime
+from base import engine, Base
 
 
 def create_tasks_table(*_):

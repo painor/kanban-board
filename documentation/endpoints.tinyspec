@@ -1,7 +1,14 @@
-// **Creates** a new task and returns it's id in the task field
+// **Creates** a new task and returns it in the task field with an id
 POST /create_new_task {title: string}
     // Returns a success message with a task object
-    => {message: string,task: Task}
-    // An error has happened while trying to add a new task
-    => 500 {error:string}
+    => {success:b,message: string,task: Task}
+    // Returns the cause of the error in the error field
+    => 500 {success:b,error:string}
+
+// **Starts** a task and returns it in the task field with an start_date field
+POST /start_task {task_id: integer}
+    // Returns a success message with a task object
+    => {success:b, message: string, task: Task}
+    // Returns the cause of the error in the error field (for example an incorrect id)
+    => 500 {success:b, error: string}
 
