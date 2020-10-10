@@ -2,23 +2,19 @@ import json
 import random
 import traceback
 
-from base import Task, Session
+from base import add_new_task
 
 
 def create_new_task(event, context):
     try:
         received_json = json.loads(event["body"])
         task_title = received_json["task_title"]
-        new_task = Task(task_title)
-        session = Session()
-        session.add(new_task)
-        session.flush()
-        session.refresh(new_task)
+        task_id = add_new_task(task_title)
         body = {
             "message": "Task created successfully",
             "task": {
                 "title": task_title,
-                "id": new_task.id,
+                "id": task_id,
                 "status": 0
             }
         }

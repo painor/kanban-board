@@ -1,0 +1,16 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Start a task",
+  "required": [
+    "task_id"
+  ],
+  "properties": {
+    "task": {
+      "type": "integer",
+      "title": "The task id",
+      "default": ""
+    }
+  }
+}

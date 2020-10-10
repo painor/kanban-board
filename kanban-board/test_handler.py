@@ -1,5 +1,7 @@
 import unittest
 import json
+from unittest.mock import patch
+
 from handler import create_new_task
 from string import ascii_lowercase
 import random
@@ -15,7 +17,9 @@ class TestHandler(unittest.TestCase):
         received_json = {"body": json.dumps({
             "task_title": task_title
         })}
-        res = create_new_task(received_json, None)
+        # monkey patch database call
+        with patch('base.add_new_task', new=lambda x: 1):
+            res = create_new_task(received_json, None)
 
         self.assertEqual(200, res['statusCode'])
         self.assertTrue(len(res['body']) > 0)
@@ -24,7 +28,8 @@ class TestHandler(unittest.TestCase):
             "message": "Task created successfully",
             "task": {
                 "title": task_title,
-                "id": int
+                "id": 1,
+                "status": 0
             }
         }
         body = json.loads(res['body'])

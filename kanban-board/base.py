@@ -22,3 +22,15 @@ class Task(Base):
 
     def __init__(self, title):
         self.title = title
+
+
+def add_new_task(title: str) -> int:
+    """
+    Adds a new task to the database and returns it's id
+    """
+    new_task = Task(title)
+    session = Session()
+    session.add(new_task)
+    session.flush()
+    session.refresh(new_task)
+    return new_task.id

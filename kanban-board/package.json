@@ -1,0 +1,21 @@
+{
+  "name": "kanban-board",
+  "version": "0.0.1",
+  "description": "Test rest api project",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/painor/kanban-board.git"
+  },
+  "author": "painor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/painor/kanban-board/issues"
+  },
+  "homepage": "https://github.com/painor/kanban-board#readme",
+  "dependencies": {
+    "serverless-plugin-scripts": "^1.0.2"
+  },
+  "devDependencies": {
+    "serverless-python-requirements": "^5.1.0"
+  }
+}

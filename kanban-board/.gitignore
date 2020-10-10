@@ -21,3 +21,5 @@ var/
 
 # db credentials
 rds_config.py
+
+node_modules
