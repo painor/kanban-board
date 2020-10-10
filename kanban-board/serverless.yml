@@ -18,7 +18,6 @@ provider:
 functions:
   create_table:
     handler: create_table.create_tasks_table
-
   create_new_task:
     handler: handler.create_new_task
     events:
@@ -28,3 +27,23 @@ functions:
           request:
             schema:
               application/json: ${file(validation_models/create_new_task.json)}
+
+  start_task:
+    handler: handler.start_task
+    events:
+      - http:
+          path: /start_task
+          method: post
+          request:
+            schema:
+              application/json: ${file(validation_models/start_task.json)}
+
+  resolve_task:
+    handler: handler.resolve_task
+    events:
+      - http:
+          path: /resolve_task
+          method: post
+          request:
+            schema:
+              application/json: ${file(validation_models/resolve_task.json)}

@@ -17,7 +17,7 @@ Base = declarative_base()
 class Status:
     NEW = 0
     IN_PROGRESS = 1
-    DONE: 2
+    DONE = 2
 
 
 class Task(Base):
@@ -54,5 +54,20 @@ def start_new_task(task_id: int) -> Task:
     task.status = Status.IN_PROGRESS
     start_date = datetime.now().timestamp()
     task.start_date = start_date
+    session.commit()
+    return task
+
+
+def resolve_a_task(task_id: int) -> Task:
+    """Resolves a task and returns it"""
+    session = Session()
+    task: Task = session.query(Task).get(task_id)
+    if not task:
+        raise Exception(f'Task with id {task_id} not found')
+    if task.status != Status.IN_PROGRESS:
+        raise Exception('Task already done or not in progress')
+    task.status = Status.DONE
+    end_date = datetime.now().timestamp()
+    task.end_date = end_date
     session.commit()
     return task

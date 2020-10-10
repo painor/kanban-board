@@ -2,7 +2,7 @@ import json
 import random
 import traceback
 
-from base import add_new_task, start_new_task
+from base import add_new_task, start_new_task, resolve_a_task
 
 
 def create_new_task(event, context):
@@ -47,6 +47,41 @@ def start_task(event, context):
                 "title": task.title,
                 "status": task.status,
                 "start_date": task.start_date
+            }
+        }
+        return {
+            "statusCode": 200,
+            "body": json.dumps(body)
+        }
+    except Exception as e:
+        traceback.print_exc()
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "success": False,
+                "error": str(e)
+            })
+        }
+
+
+def resolve_task(event, context):
+    try:
+        received_json = json.loads(event["body"])
+        task_id = received_json["task_id"]
+        task = resolve_a_task(task_id)
+        duration = task.end_date - task.start_date
+        # hourly rate is 10$
+        price = (duration / 3600) * 10
+
+        body = {
+            "success": True,
+            "message": "Task started successfully",
+            "task": {
+                "id": task.id,
+                "title": task.title,
+                "status": task.status,
+                "start_date": task.start_date,
+                "price": price
             }
         }
         return {

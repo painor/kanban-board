@@ -3,8 +3,8 @@ import json
 from datetime import datetime
 from unittest.mock import patch
 
-from base import Task
-from handler import create_new_task, start_task
+from base import Task, Status
+from handler import create_new_task, start_task, resolve_task
 from string import ascii_lowercase
 import random
 
@@ -30,9 +30,9 @@ class TestHandler(unittest.TestCase):
             'success': True,
             'message': 'Task created successfully',
             'task': {
-                'title': task_title,
                 'id': 1,
-                'status': 0
+                'title': task_title,
+                'status': Status.NEW
             }
         }
         body = json.loads(res['body'])
@@ -51,7 +51,7 @@ class TestHandler(unittest.TestCase):
         def return_moch_task(*args):
             task = Task('random_name')
             task.id = 1
-            task.status = 1
+            task.status = Status.IN_PROGRESS
             task.start_date = date
             return task
 
@@ -63,11 +63,39 @@ class TestHandler(unittest.TestCase):
         excepted_result = {
             'success': True,
             'message': 'Task started successfully',
-            'task': {'id': 1, 'title': 'random_name', 'status': 1, 'start_date': date}
+            'task': {'id': 1, 'title': 'random_name', 'status': Status.IN_PROGRESS, 'start_date': date}
         }
         body = json.loads(res['body'])
-        print(body)
-        print(excepted_result)
+        self.assertTrue(json.dumps(body) == json.dumps(excepted_result))
+
+    def test_resolve_task(self):
+        """Tests resolve task"""
+        task_id = 1
+        received_json = {'body': json.dumps({
+            'task_id': task_id
+        })}
+
+        # monkey patch database call
+        date = datetime.now().timestamp()
+
+        def return_moch_task(*args):
+            task = Task('random_name')
+            task.id = 1
+            task.status = Status.DONE
+            task.start_date = date
+            task.end_date = date + 3600
+            return task
+
+        with patch('handler.resolve_a_task', new=return_moch_task):
+            res = resolve_task(received_json, None)
+        self.assertEqual(200, res['statusCode'])
+        self.assertTrue(len(res['body']) > 0)
+
+        excepted_result = {'success': True, 'message': 'Task started successfully',
+                           'task': {'id': 1, 'title': 'random_name', 'status': 2, 'start_date': date,
+                                    'price': 10.0}}
+
+        body = json.loads(res['body'])
         self.assertTrue(json.dumps(body) == json.dumps(excepted_result))
 
 

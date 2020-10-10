@@ -12,3 +12,11 @@ POST /start_task {task_id: integer}
     // Returns the cause of the error in the error field (for example an incorrect id)
     => 500 {success:b, error: string}
 
+
+// **Resolves** a task and returns it in the task field with an price field
+POST /resolve_task {task_id: integer}
+    // Returns a success message with a task object
+    => {success:b, message: string, task: Task}
+    // Returns the cause of the error in the error field (for example an incorrect id)
+    => 500 {success:b, error: string}
+
