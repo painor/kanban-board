@@ -3,6 +3,8 @@ app: kanban-board
 service: kanban-board
 plugins:
   - serverless-python-requirements
+  - serverless-plugin-scripts
+
 custom:
   scripts:
     hooks:
@@ -24,6 +26,7 @@ functions:
       - http:
           path: /new_task
           method: post
+          cors: true
           request:
             schema:
               application/json: ${file(validation_models/create_new_task.json)}
@@ -34,6 +37,7 @@ functions:
       - http:
           path: /start_task
           method: post
+          cors: true
           request:
             schema:
               application/json: ${file(validation_models/start_task.json)}
@@ -44,6 +48,7 @@ functions:
       - http:
           path: /resolve_task
           method: post
+          cors: true
           request:
             schema:
               application/json: ${file(validation_models/resolve_task.json)}
@@ -55,10 +60,11 @@ functions:
       - http:
           path: /tasks
           method: get
-
+          cors: true
   retrieve_task:
     handler: handler.get_task
     events:
       - http:
           path: /tasks/{id}
           method: get
+          cors: true

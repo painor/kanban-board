@@ -1,10 +1,12 @@
 import json
 import random
 import traceback
+from lambda_decorators import cors_headers
 
 from base import add_new_task, start_new_task, resolve_a_task, get_all_tasks, get_a_task
 
 
+@cors_headers
 def create_new_task(event, context):
     try:
         received_json = json.loads(event["body"])
@@ -34,6 +36,7 @@ def create_new_task(event, context):
         }
 
 
+@cors_headers
 def start_task(event, context):
     try:
         received_json = json.loads(event["body"])
@@ -42,12 +45,7 @@ def start_task(event, context):
         body = {
             "success": True,
             "message": "Task started successfully",
-            "task": {
-                "id": task.id,
-                "title": task.title,
-                "status": task.status,
-                "start_date": task.start_date
-            }
+            "task": task.to_dict()
         }
         return {
             "statusCode": 200,
@@ -55,6 +53,7 @@ def start_task(event, context):
         }
     except Exception as e:
         traceback.print_exc()
+        print(e)
         return {
             "statusCode": 500,
             "body": json.dumps({
@@ -64,6 +63,7 @@ def start_task(event, context):
         }
 
 
+@cors_headers
 def resolve_task(event, context):
     try:
         received_json = json.loads(event["body"])
@@ -73,13 +73,7 @@ def resolve_task(event, context):
         body = {
             "success": True,
             "message": "Task started successfully",
-            "task": {
-                "id": task.id,
-                "title": task.title,
-                "status": task.status,
-                "start_date": task.start_date,
-                "price": task.price
-            }
+            "task":task.to_dict()
         }
         return {
             "statusCode": 200,
@@ -96,6 +90,7 @@ def resolve_task(event, context):
         }
 
 
+@cors_headers
 def get_tasks(event, context):
     try:
         filter_by = None
@@ -124,6 +119,7 @@ def get_tasks(event, context):
         }
 
 
+@cors_headers
 def get_task(event, context):
     try:
         param: str = event["pathParameters"]["id"]

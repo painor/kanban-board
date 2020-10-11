@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import create_engine, Column, String, Integer, TIMESTAMP
+from sqlalchemy import create_engine, Column, String, Integer, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -26,9 +26,9 @@ class Task(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     title = Column('title', String)
     status = Column('status', Integer)
-    start_date = Column('start_date', TIMESTAMP)
-    end_date = Column('end_date', TIMESTAMP)
-    price = Column('price', Integer)
+    start_date = Column('start_date', Numeric)
+    end_date = Column('end_date', Numeric)
+    price = Column('price', Numeric)
 
     def __init__(self, title):
         self.title = title
@@ -43,11 +43,11 @@ class Task(Base):
         if self.status:
             d["status"] = self.status
         if self.start_date:
-            d["start_date"] = self.start_date
+            d["start_date"] = str(self.start_date)
         if self.end_date:
-            d["end_date"] = self.end_date
+            d["end_date"] = str(self.end_date)
         if self.price:
-            d["price"] = self.price
+            d["price"] = str(self.price)
         return d
 
 
@@ -58,6 +58,7 @@ def add_new_task(title: str) -> int:
     session.add(new_task)
     session.flush()
     session.refresh(new_task)
+    session.commit()
     return new_task.id
 
 
@@ -87,7 +88,7 @@ def resolve_a_task(task_id: int) -> Task:
     task.status = Status.DONE
     end_date = datetime.now().timestamp()
     task.end_date = end_date
-    task.price = (task.start_date - task.end_date) * 10 / 3600
+    task.price = (task.end_date - float(task.start_date)) * 10 / 3600
     session.commit()
     return task
 

@@ -7,7 +7,7 @@
     "task_id"
   ],
   "properties": {
-    "task": {
+    "task_id": {
       "type": "integer",
       "title": "The task id",
       "default": ""
